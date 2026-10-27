@@ -2,15 +2,14 @@
 
 ![Build](https://github.com/YevheniiKotyrlo/rn-release-bundle-resets-metro-cache/workflows/Pre%20Merge%20Checks/badge.svg)
 
-This is your new React Native Reproducer project.
+React Native 0.88.1's template app, where an Android release bundle empties the machine-wide Metro cache: the Gradle plugin's `BundleHermesCTask` always passes `--reset-cache`, and Metro's default cache root is `os.tmpdir()/metro-cache`.
 
-# Reproducer TODO list
+## Reproduce
 
-- [x] 1. Create a new reproducer project.
-- [ ] 2. Git clone your repository locally.
-- [ ] 3. Edit the project to reproduce the failure you're seeing.
-- [ ] 4. Push your changes, so that Github Actions can run the CI.
-- [ ] 5. Make sure the repository is public and share the link with the issue you reported.
+1. `cd ReproducerApp && yarn`
+2. Leave an entry in Metro's cache root, as another bundler would: `mkdir -p "$TMPDIR/metro-cache/00" && echo x > "$TMPDIR/metro-cache/00/entry-from-another-bundler"` (on Windows, `%TEMP%`).
+3. `cd android && ./gradlew :app:createBundleReleaseJsAndAssets`
+4. `ls "$TMPDIR/metro-cache/00/entry-from-another-bundler"`: the entry is gone. The task ran `bundle --platform android --dev false --reset-cache --entry-file index.js`, and `metro-cache` holds only this bundle's entries.
 
 # How to use this Reproducer
 
